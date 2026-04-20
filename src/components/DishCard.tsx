@@ -1,48 +1,47 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Dish } from "../types";
-import { calcDDay, formatDDay, getDDayStatus } from "../utils/date";
+import { calcDDay } from "../utils/date";
+import { COLORS, SPACING, TYPO } from "@/src/theme/designSystem";
+import Card from "@/src/components/ui/Card";
+import StatusBadge from "@/src/components/ui/StatusBadge";
 
 type Props = {
   dish: Dish;
   onPress: () => void;
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  expired: "#ef4444",
-  today: "#f97316",
-  soon: "#eab308",
-  safe: "#22c55e",
-};
-
 export default function DishCard({ dish, onPress }: Props) {
   const dDay = calcDDay(dish.expireAt);
-  const status = getDDayStatus(dDay);
-  const color = STATUS_COLORS[status];
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
-      <Text style={styles.name}>{dish.name}</Text>
-      <Text style={[styles.dday, { color }]}>{formatDDay(dDay)}</Text>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <Card>
+        <View style={styles.row}>
+          <View>
+            <Text style={styles.name}>{dish.name}</Text>
+            <Text style={styles.meta}>{dish.category}</Text>
+          </View>
+          <StatusBadge dday={dDay} />
+        </View>
+      </Card>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
+  row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e7eb",
   },
   name: {
-    fontSize: 16,
+    ...TYPO.subtitle,
+    color: COLORS.text,
   },
-  dday: {
-    fontSize: 14,
-    fontWeight: "600",
+  meta: {
+    ...TYPO.caption,
+    color: COLORS.subText,
+    marginTop: SPACING.xs,
   },
 });

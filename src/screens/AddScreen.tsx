@@ -1,18 +1,23 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
+import * as Haptics from "expo-haptics";
 import {
   Alert,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { v4 as uuidv4 } from "uuid";
 import { useDishStore } from "../store/useDishStore";
 import { DishCategory, StorageType } from "../types";
 import { CATEGORIES, getRecommendedDays } from "../utils/categoryRules";
 import { calcExpireAt } from "../utils/date";
+import { COLORS, SPACING, TYPO } from "@/src/theme/designSystem";
+import PrimaryButton from "@/src/components/ui/PrimaryButton";
 
 export default function AddScreen() {
   const router = useRouter();
@@ -44,69 +49,87 @@ export default function AddScreen() {
       status: "active",
     });
 
+    await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     router.back();
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>반찬 이름</Text>
-      <TextInput
-        style={styles.input}
-        value={name}
-        onChangeText={setName}
-        placeholder="예: 시금치 나물"
-        autoFocus
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit}
-      />
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.content}>
+        <Text style={styles.title}>반찬 추가</Text>
 
-      <Text style={styles.label}>카테고리</Text>
-      <View style={styles.row}>
-        {CATEGORIES.map((c) => (
-          <TouchableOpacity
-            key={c}
-            style={[styles.chip, category === c && styles.chipActive]}
-            onPress={() => setCategory(c)}
-          >
-            <Text style={[styles.chipText, category === c && styles.chipTextActive]}>
-              {c}
-            </Text>
-          </TouchableOpacity>
-        ))}
+        <Text style={styles.label}>반찬 이름</Text>
+        <TextInput
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+          placeholder="예: 시금치 나물"
+          placeholderTextColor={COLORS.neutral}
+          autoFocus
+          returnKeyType="done"
+          onSubmitEditing={handleSubmit}
+        />
+
+        <Text style={styles.label}>카테고리</Text>
+        <View style={styles.row}>
+          {CATEGORIES.map((c) => (
+            <TouchableOpacity
+              key={c}
+              style={[styles.chip, category === c && styles.chipActive]}
+              onPress={() => setCategory(c)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.chipText, category === c && styles.chipTextActive]}>{c}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <Text style={styles.label}>보관 방법</Text>
+        <View style={styles.row}>
+          {(["fridge", "freezer"] as StorageType[]).map((s) => (
+            <TouchableOpacity
+              key={s}
+              style={[styles.chip, storageType === s && styles.chipActive]}
+              onPress={() => setStorageType(s)}
+              activeOpacity={0.7}
+            >
+              <Text style={[styles.chipText, storageType === s && styles.chipTextActive]}>
+                {s === "fridge" ? "냉장" : "냉동"}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </ScrollView>
+      <View style={styles.submitWrap}>
+        <PrimaryButton title="저장" onPress={handleSubmit} />
       </View>
-
-      <Text style={styles.label}>보관 방법</Text>
-      <View style={styles.row}>
-        {(["fridge", "freezer"] as StorageType[]).map((s) => (
-          <TouchableOpacity
-            key={s}
-            style={[styles.chip, storageType === s && styles.chipActive]}
-            onPress={() => setStorageType(s)}
-          >
-            <Text style={[styles.chipText, storageType === s && styles.chipTextActive]}>
-              {s === "fridge" ? "냉장" : "냉동"}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <TouchableOpacity style={styles.submit} onPress={handleSubmit}>
-        <Text style={styles.submitText}>저장</Text>
-      </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
-  label: { fontSize: 13, color: "#6b7280", marginBottom: 8, marginTop: 20 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.md },
+  title: {
+    ...TYPO.title,
+    color: COLORS.text,
+    marginBottom: SPACING.sm,
+  },
+  label: {
+    ...TYPO.body,
+    color: COLORS.subText,
+    marginBottom: SPACING.sm,
+    marginTop: SPACING.md,
+  },
   input: {
     borderWidth: 1,
-    borderColor: "#d1d5db",
-    borderRadius: 8,
+    borderColor: "#E3E5E8",
+    borderRadius: 12,
     paddingHorizontal: 12,
     paddingVertical: 10,
-    fontSize: 16,
+    ...TYPO.subtitle,
+    color: COLORS.text,
+    backgroundColor: COLORS.card,
   },
   row: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   chip: {
@@ -114,17 +137,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "#d1d5db",
+    borderColor: "#E3E5E8",
+    backgroundColor: COLORS.card,
   },
-  chipActive: { backgroundColor: "#3b82f6", borderColor: "#3b82f6" },
-  chipText: { fontSize: 14, color: "#374151" },
+  chipActive: { backgroundColor: COLORS.primary, borderColor: COLORS.primary },
+  chipText: { ...TYPO.body, color: COLORS.subText },
   chipTextActive: { color: "#fff" },
-  submit: {
-    marginTop: 36,
-    backgroundColor: "#3b82f6",
-    paddingVertical: 14,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  submitText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  submitWrap: { padding: SPACING.md, paddingTop: SPACING.sm },
 });

@@ -1,15 +1,14 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React from "react";
+import * as Haptics from "expo-haptics";
 import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useDishStore } from "../store/useDishStore";
-import { calcDDay, formatDDay, getDDayStatus } from "../utils/date";
-
-const STATUS_COLORS: Record<string, string> = {
-  expired: "#ef4444",
-  today: "#f97316",
-  soon: "#eab308",
-  safe: "#22c55e",
-};
+import { calcDDay } from "../utils/date";
+import { COLORS, SPACING, TYPO } from "@/src/theme/designSystem";
+import Card from "@/src/components/ui/Card";
+import PrimaryButton from "@/src/components/ui/PrimaryButton";
+import StatusBadge from "@/src/components/ui/StatusBadge";
 
 export default function DetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -21,15 +20,13 @@ export default function DetailScreen() {
 
   if (!dish) {
     return (
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
         <Text style={styles.notFound}>반찬을 찾을 수 없어요</Text>
-      </View>
+      </SafeAreaView>
     );
   }
 
   const dDay = calcDDay(dish.expireAt);
-  const status = getDDayStatus(dDay);
-  const ddayColor = STATUS_COLORS[status];
 
   async function handleAction(action: "eaten" | "discarded") {
     const label = action === "eaten" ? "먹었어요" : "버렸어요";
@@ -39,6 +36,7 @@ export default function DetailScreen() {
         text: "확인",
         onPress: async () => {
           await updateDish(id, { status: action });
+          await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
           router.back();
         },
       },
@@ -46,32 +44,32 @@ export default function DetailScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.name}>{dish.name}</Text>
-      <Text style={[styles.dday, { color: ddayColor }]}>{formatDDay(dDay)}</Text>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.content}>
+        <Text style={styles.name}>{dish.name}</Text>
+        <View style={styles.badgeWrap}>
+          <StatusBadge dday={dDay} />
+        </View>
 
-      <View style={styles.infoBox}>
-        <Row label="카테고리" value={dish.category} />
-        <Row label="보관" value={dish.storageType === "fridge" ? "냉장" : "냉동"} />
-        <Row label="권장 보관일" value={`${dish.recommendedDays}일`} />
-        <Row label="만료일" value={dish.expireAt.slice(0, 10)} />
+        <Card>
+          <Row label="카테고리" value={dish.category} />
+          <Row label="보관" value={dish.storageType === "fridge" ? "냉장" : "냉동"} />
+          <Row label="권장 보관일" value={`${dish.recommendedDays}일`} />
+          <Row label="만료일" value={dish.expireAt.slice(0, 10)} />
+        </Card>
       </View>
 
       <View style={styles.actions}>
+        <PrimaryButton title="먹었어요" onPress={() => handleAction("eaten")} />
         <TouchableOpacity
-          style={[styles.btn, styles.btnEaten]}
-          onPress={() => handleAction("eaten")}
-        >
-          <Text style={styles.btnText}>먹었어요</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.btn, styles.btnDiscarded]}
+          style={styles.discardBtn}
           onPress={() => handleAction("discarded")}
+          activeOpacity={0.7}
         >
-          <Text style={styles.btnText}>버렸어요</Text>
+          <Text style={styles.discardText}>버렸어요</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -85,34 +83,28 @@ function Row({ label, value }: { label: string; value: string }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 24 },
-  notFound: { textAlign: "center", marginTop: 60, color: "#9ca3af" },
-  name: { fontSize: 26, fontWeight: "700", marginBottom: 6 },
-  dday: { fontSize: 20, fontWeight: "600", marginBottom: 28 },
-  infoBox: {
-    borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    marginBottom: 36,
-  },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { flex: 1, padding: SPACING.md },
+  notFound: { textAlign: "center", marginTop: 60, color: COLORS.subText },
+  name: { ...TYPO.title, color: COLORS.text, marginBottom: SPACING.sm },
+  badgeWrap: { alignSelf: "flex-start", marginBottom: SPACING.md },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 12,
+    paddingVertical: SPACING.sm,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: "#e5e7eb",
+    borderBottomColor: "#E3E5E8",
   },
-  rowLabel: { color: "#6b7280", fontSize: 14 },
-  rowValue: { fontSize: 14, fontWeight: "500" },
-  actions: { flexDirection: "row", gap: 12 },
-  btn: {
-    flex: 1,
+  rowLabel: { ...TYPO.body, color: COLORS.subText },
+  rowValue: { ...TYPO.body, color: COLORS.text, fontWeight: "500" },
+  actions: { padding: SPACING.md, paddingTop: SPACING.sm, gap: SPACING.sm },
+  discardBtn: {
     paddingVertical: 14,
-    borderRadius: 10,
+    borderRadius: 12,
     alignItems: "center",
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.danger,
   },
-  btnEaten: { backgroundColor: "#22c55e" },
-  btnDiscarded: { backgroundColor: "#ef4444" },
-  btnText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  discardText: { ...TYPO.subtitle, color: COLORS.danger },
 });
