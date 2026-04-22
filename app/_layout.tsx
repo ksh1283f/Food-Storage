@@ -41,7 +41,7 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="detail"
+          name="[id]"
           options={{
             title: '상세',
             headerStyle: { backgroundColor: COLORS.bg },

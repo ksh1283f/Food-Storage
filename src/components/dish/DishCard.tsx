@@ -1,7 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { Dish } from "../types";
-import { calcDDay } from "../utils/date";
+import { Dish } from "@/src/types";
+import { calcDDay } from "@/src/utils/date";
 import { COLORS, SPACING, TYPO } from "@/src/theme/designSystem";
 import Card from "@/src/components/ui/Card";
 import StatusBadge from "@/src/components/ui/StatusBadge";
