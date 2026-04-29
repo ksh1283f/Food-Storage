@@ -1,89 +1,111 @@
+import Card from "@/src/components/ui/Card";
 import PrimaryButton from "@/src/components/ui/PrimaryButton";
 import { useRecipeStore } from "@/src/store/useRecipeStore";
-import { RecipeMatch } from "@/src/types/recipe";
+import { COLORS, SPACING, TYPO } from "@/src/theme/designSystem";
+import { Recipe } from "@/src/types";
+import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function RecipeScreen() {
-  const { recipes, fetchRecipes } = useRecipeStore();
+  const router = useRouter();
+  const { recipes, loading, error, fetchRecipes } = useRecipeStore();
 
   useEffect(() => {
     fetchRecipes();
-  }, [fetchRecipes]);
+  }, []);
 
+  if (loading) {
+    return (
+      <View style={styles.center}>
+        <ActivityIndicator size="large" color={COLORS.primary} />
+        <Text style={styles.loadingText}>AI가 레시피를 추천 중이에요...</Text>
+      </View>
+    );
+  }
 
-  
+  if (error) {
+    return (
+      <View style={styles.center}>
+        <Text style={styles.errorText}>{error}</Text>
+        <PrimaryButton title="다시 시도" onPress={fetchRecipes} style={styles.retryBtn} />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>추천 요리</Text>
+    <SafeAreaView style={styles.container} edges={["bottom"]}>
       <FlatList
         data={recipes}
-        keyExtractor={(item) => item.recipe.id}
-        renderItem={({ item }) => <RecipeCard item={item} />}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.list}
+        renderItem={({ item }) => (
+          <RecipeCard recipe={item} onPress={() => router.push(`/recipe/${item.id}`)} />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.empty}>냉장고 재료를 기반으로{"\n"}레시피를 추천받아보세요</Text>
+        }
+        ListFooterComponent={
+          recipes.length > 0 ? (
+            <PrimaryButton title="다시 추천받기" onPress={fetchRecipes} style={styles.refreshBtn} />
+          ) : null
+        }
       />
-      <PrimaryButton title="+ 반찬 추가" onPress={handleAdd} />
-    </View>
+      {recipes.length === 0 && (
+        <View style={styles.btnWrap}>
+          <PrimaryButton title="레시피 추천받기" onPress={fetchRecipes} />
+        </View>
+      )}
+    </SafeAreaView>
   );
 }
 
-function handleAdd(){
-  console.log("test");
-}
-
-type RecipeCardProps = {
-  item: RecipeMatch;
-};
-
-function RecipeCard({ item }: RecipeCardProps) {
-  const { recipe, matched, missing, score } = item;
+function RecipeCard({ recipe, onPress }: { recipe: Recipe; onPress: () => void }) {
+  const availableCount = recipe.ingredients.length - recipe.missingIngredients.length;
+  const totalCount = recipe.ingredients.length;
+  const pct = totalCount > 0 ? Math.round((availableCount / totalCount) * 100) : 0;
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.name}>{recipe.name}</Text>
-
-      <Text style={styles.score}>완성도: {Math.round(score * 100)}%</Text>
-      <Text style={styles.section}>보유 재료</Text>
-      <Text>{matched.join(", ")}</Text>
-
-      {missing.length > 0 && (
-        <>
-          <Text style={styles.missing}>부족 재료</Text>
-          <Text>{missing.join(", ")}</Text>
-        </>
-      )}
-    </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.7}>
+      <Card>
+        <View style={styles.row}>
+          <Text style={styles.recipeName}>{recipe.name}</Text>
+          <Text style={[styles.score, { color: pct >= 70 ? COLORS.success : COLORS.warning }]}>
+            {pct}%
+          </Text>
+        </View>
+        <Text style={styles.desc} numberOfLines={2}>{recipe.description}</Text>
+        {recipe.missingIngredients.length > 0 && (
+          <Text style={styles.missing}>
+            부족한 재료: {recipe.missingIngredients.join(", ")}
+          </Text>
+        )}
+      </Card>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 12,
-  },
-  card: {
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: "#f5f5f5",
-    marginBottom: 12,
-  },
-  name: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  score: {
-    marginVertical: 6,
-  },
-  section: {
-    marginTop: 8,
-    fontWeight: "600",
-  },
-  missing: {
-    marginTop: 8,
-    color: "red",
-  },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  list: { padding: SPACING.md, paddingBottom: SPACING.lg },
+  center: { flex: 1, justifyContent: "center", alignItems: "center", padding: SPACING.lg },
+  loadingText: { ...TYPO.body, color: COLORS.subText, marginTop: SPACING.md },
+  errorText: { ...TYPO.body, color: COLORS.danger, marginBottom: SPACING.md, textAlign: "center" },
+  retryBtn: { width: 160 },
+  empty: { ...TYPO.body, color: COLORS.subText, textAlign: "center", marginTop: 80, lineHeight: 24 },
+  row: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginBottom: SPACING.xs },
+  recipeName: { ...TYPO.subtitle, color: COLORS.text, flex: 1 },
+  score: { ...TYPO.subtitle, marginLeft: SPACING.sm },
+  desc: { ...TYPO.body, color: COLORS.subText, marginBottom: SPACING.sm },
+  missing: { ...TYPO.caption, color: COLORS.danger },
+  refreshBtn: { marginTop: SPACING.md },
+  btnWrap: { padding: SPACING.md },
 });

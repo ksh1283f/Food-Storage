@@ -8,8 +8,18 @@
     "scheme": "foodstorage",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "updates": {
+      "url": "https://u.expo.dev/dfa8285c-3f13-4025-8bd7-39be3faeb219",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0,
+      "checkAutomatically": "ON_LOAD"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.eternalnomad.foodstorage"
     },
     "android": {
       "adaptiveIcon": {
@@ -20,7 +30,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.eternalnomad.foodstorage"
+      "package": "com.eternalnomad.foodstorage",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "output": "static",

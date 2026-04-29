@@ -1,15 +1,13 @@
-export async function fetchAIRecipes(ingredients: string[]){
-    const res = await fetch("https://food-storage-back.onrender.com/recipes/ai-recommend", {
-        method: "POST",
-        headers:{
-            "Content-Type" : "application/json",
-        },
-        body: JSON.stringify({
-            ingredients,
-            expiringIngredients: [],
-            preferences: { difficulty: "ease" },
-        }),
-    });
+import { api } from "@/src/lib/api";
+import { RecipeListResponse } from "@/src/types";
+import { mapRecipeList } from "@/src/utils/recipeMapper";
 
-    return res.json();
+export async function fetchAIRecipes(ingredients: string[]) {
+  const data = await api.post<RecipeListResponse>("/recipes/ai-recommend", {
+    ingredients,
+    expiringIngredients: [],
+    preferences: { difficulty: "ease" },
+  });
+
+  return mapRecipeList(data);
 }

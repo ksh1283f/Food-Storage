@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1043747608978",
+    "project_id": "food-storage-9bd85",
+    "storage_bucket": "food-storage-9bd85.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1043747608978:android:5c15d28d0f768070d5c94b",
+        "android_client_info": {
+          "package_name": "com.eternalnomad.foodstorage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1043747608978-pgahqh8ip3qeclbkt3hrbh298hd2uqlm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eternalnomad.foodstorage",
+            "certificate_hash": "39edef01c6f0e74dc057e00fe86f1a59eab7e0be"
+          }
+        },
+        {
+          "client_id": "1043747608978-m1gisbciuviv5oq4bd4i4je7946iqjn2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwmcgwxtI3z_wuLjKRcaX2fDI1V1alZeA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1043747608978-m1gisbciuviv5oq4bd4i4je7946iqjn2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
