@@ -1,7 +1,8 @@
-import { useEffect } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import PrimaryButton from "@/src/components/ui/PrimaryButton";
 import { useRecipeStore } from "@/src/store/useRecipeStore";
 import { RecipeMatch } from "@/src/types/recipe";
+import { useEffect } from "react";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 
 export default function RecipeScreen() {
   const { recipes, fetchRecipes } = useRecipeStore();
@@ -10,17 +11,23 @@ export default function RecipeScreen() {
     fetchRecipes();
   }, [fetchRecipes]);
 
+
+  
   return (
     <View style={styles.container}>
       <Text style={styles.title}>추천 요리</Text>
-
       <FlatList
         data={recipes}
         keyExtractor={(item) => item.recipe.id}
         renderItem={({ item }) => <RecipeCard item={item} />}
       />
+      <PrimaryButton title="+ 반찬 추가" onPress={handleAdd} />
     </View>
   );
+}
+
+function handleAdd(){
+  console.log("test");
 }
 
 type RecipeCardProps = {

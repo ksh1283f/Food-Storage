@@ -1,12 +1,13 @@
-import * as Haptics from "expo-haptics";
-import { useRouter } from "expo-router";
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import DishCard from "@/src/components/dish/DishCard";
 import PrimaryButton from "@/src/components/ui/PrimaryButton";
 import { useDishes } from "@/src/hooks/useDishes";
 import { COLORS, SPACING, TYPO } from "@/src/theme/designSystem";
 import { Dish } from "@/src/types";
+import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
+import { FlatList, StyleSheet, Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 
 export default function HomeScreen() {
   const router = useRouter();
