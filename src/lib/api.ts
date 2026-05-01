@@ -20,8 +20,16 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   });
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message ?? `HTTP ${response.status}`);
+    const text = await response.text().catch(() => "");
+    let message = `HTTP ${response.status}`;
+    try {
+      const json = JSON.parse(text);
+      message = (json.message ?? json.error ?? text) || message;
+    } catch {
+      if (text) message = text;
+    }
+    console.error(`[API Error] ${response.status} ${response.url}\n${message}`);
+    throw new Error(message);
   }
 
   return response.json();

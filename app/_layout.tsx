@@ -66,6 +66,7 @@ export default function RootLayout() {
             headerStyle: { backgroundColor: COLORS.bg },
             headerShadowVisible: true,
             headerTitleStyle: { ...TYPO.subtitle, color: COLORS.text },
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
         <Stack.Screen
@@ -75,6 +76,7 @@ export default function RootLayout() {
             headerStyle: { backgroundColor: COLORS.bg },
             headerShadowVisible: false,
             headerTitleStyle: { ...TYPO.subtitle, color: COLORS.text },
+            headerBackButtonDisplayMode: "minimal",
           }}
         />
       </Stack>

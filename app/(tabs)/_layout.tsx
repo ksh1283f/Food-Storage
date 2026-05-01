@@ -17,7 +17,7 @@ export default function TabsLayout() {
         options={{
           title: "냉장고",
           tabBarLabel: "홈",
-          headerShown: false,
+          headerShown: true,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="nutrition-outline" size={size} color={color} />
           ),
@@ -28,7 +28,7 @@ export default function TabsLayout() {
         options={{
           title: "추천 요리",
           tabBarLabel: "레시피",
-          headerShown: false,
+          headerShown: true,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="restaurant-outline" size={size} color={color} />
           ),
